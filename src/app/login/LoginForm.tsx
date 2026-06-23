@@ -30,8 +30,7 @@ export default function LoginPage() {
       height: '100dvh', padding: '1rem',
     }}>
       <form onSubmit={handleLogin} style={{ width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>msg</h1>
-        <input
+<input
           type="email"
           placeholder="Email"
           value={email}

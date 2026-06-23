@@ -15,7 +15,7 @@ export function ChatView({ userId }: { userId: string }) {
         borderBottom: '1px solid var(--border)', display: 'flex',
         alignItems: 'center', justifyContent: 'space-between',
       }}>
-        <span style={{ fontWeight: 700, fontSize: '1.1rem' }}>msg</span>
+        <span />
         {!subscribed && (
           <button
             onClick={subscribe}

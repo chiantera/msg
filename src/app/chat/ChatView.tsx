@@ -35,9 +35,9 @@ export function ChatView({ userId }: { userId: string }) {
         flex: 1, overflowY: 'auto', padding: '1rem',
         paddingTop: 'max(2.5rem, env(safe-area-inset-top))',
         backgroundImage: 'linear-gradient(rgba(15,15,15,0.55), rgba(15,15,15,0.55)), url(/bg.png)',
-        backgroundSize: 'cover',
+        backgroundSize: 'contain',
         backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
+        backgroundRepeat: 'repeat',
         backgroundAttachment: 'local',
       }}>
         {loading && <p style={{ color: 'var(--text-muted)', textAlign: 'center' }}>...</p>}

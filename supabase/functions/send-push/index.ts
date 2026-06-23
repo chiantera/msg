@@ -1,7 +1,12 @@
-import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 // @deno-types="npm:@types/web-push"
 import webpush from 'npm:web-push'
+
+const cors = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
 
 webpush.setVapidDetails(
   Deno.env.get('VAPID_EMAIL')!,
@@ -9,7 +14,11 @@ webpush.setVapidDetails(
   Deno.env.get('VAPID_PRIVATE_KEY')!,
 )
 
-serve(async (req) => {
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: cors })
+  }
+
   const { message_id, sender_id } = await req.json()
 
   const supabase = createClient(
@@ -24,7 +33,7 @@ serve(async (req) => {
     .single()
 
   if (!message || message.silent) {
-    return new Response('silent', { status: 200 })
+    return new Response('silent', { status: 200, headers: cors })
   }
 
   const { data: recipients } = await supabase
@@ -34,7 +43,7 @@ serve(async (req) => {
     .not('push_subscription', 'is', null)
 
   if (!recipients?.length) {
-    return new Response('no subscribers', { status: 200 })
+    return new Response('no subscribers', { status: 200, headers: cors })
   }
 
   const payload = JSON.stringify({
@@ -48,5 +57,5 @@ serve(async (req) => {
     ),
   )
 
-  return new Response('ok', { status: 200 })
+  return new Response('ok', { status: 200, headers: cors })
 })

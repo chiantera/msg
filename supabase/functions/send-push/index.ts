@@ -24,7 +24,6 @@ function b64url(data: string | Uint8Array): string {
   return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
 
-// Service account → access token OAuth2 per FCM HTTP v1.
 async function getFcmAccessToken(sa: { client_email: string; private_key: string }): Promise<string> {
   const now = Math.floor(Date.now() / 1000)
   const header = b64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }))
@@ -62,7 +61,8 @@ async function getFcmAccessToken(sa: { client_email: string; private_key: string
   return json.access_token
 }
 
-async function sendFcm(projectId: string, accessToken: string, token: string, title: string, body: string) {
+// Invia un messaggio FCM DATA-ONLY: il servizio nativo costruisce la notifica MessagingStyle.
+async function sendFcm(projectId: string, accessToken: string, token: string, data: Record<string, string>) {
   const r = await fetch(`https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`, {
     method: 'POST',
     headers: {
@@ -72,9 +72,8 @@ async function sendFcm(projectId: string, accessToken: string, token: string, ti
     body: JSON.stringify({
       message: {
         token,
-        notification: { title, body },
+        data,
         android: { priority: 'high' },
-        data: { url: '/chat' },
       },
     }),
   })
@@ -121,15 +120,23 @@ Deno.serve(async (req) => {
   const sa = JSON.parse(raw)
   const accessToken = await getFcmAccessToken(sa)
 
-  const title = message.profiles?.display_name ?? 'msg'
+  const senderName = message.profiles?.display_name ?? 'msg'
   const body = message.voice_url
     ? '🎤 Vocale'
     : message.photo_url
     ? '📷 Foto'
     : (message.content ?? '')
 
+  const data = {
+    type: 'message',
+    senderId: String(sender_id),
+    senderName,
+    body,
+    sentAt: String(message.created_at ?? Date.now()),
+  }
+
   await Promise.all(
-    recipients.map((r) => sendFcm(sa.project_id, accessToken, r.fcm_token, title, body).catch(console.error)),
+    recipients.map((r) => sendFcm(sa.project_id, accessToken, r.fcm_token, data).catch(console.error)),
   )
 
   return new Response('ok', { status: 200, headers: cors })

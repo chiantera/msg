@@ -62,5 +62,12 @@ export function useMessages() {
       .eq('id', id)
   }
 
-  return { messages, loading, bottomRef, deleteMessage }
+  const editMessage = async (id: string, content: string) => {
+    await supabase
+      .from('messages')
+      .update({ content, edited_at: new Date().toISOString() })
+      .eq('id', id)
+  }
+
+  return { messages, loading, bottomRef, deleteMessage, editMessage }
 }

@@ -14,6 +14,7 @@ export interface Message {
   silent: boolean
   read_at: string | null
   deleted_at: string | null
+  edited_at: string | null
   created_at: string
   profiles?: Pick<Profile, 'id' | 'display_name'>
 }

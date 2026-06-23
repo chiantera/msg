@@ -6,7 +6,7 @@ import { MessageBubble } from '@/components/MessageBubble'
 import { MessageInput } from '@/components/MessageInput'
 
 export function ChatView({ userId }: { userId: string }) {
-  const { messages, loading, bottomRef, deleteMessage } = useMessages()
+  const { messages, loading, bottomRef, deleteMessage, editMessage } = useMessages()
   const router = useRouter()
 
   const handleLogout = async () => {
@@ -34,7 +34,7 @@ export function ChatView({ userId }: { userId: string }) {
       <main style={{ flex: 1, overflowY: 'auto', padding: '1rem', paddingTop: 'max(2.5rem, env(safe-area-inset-top))' }}>
         {loading && <p style={{ color: 'var(--text-muted)', textAlign: 'center' }}>...</p>}
         {messages.map((msg) => (
-          <MessageBubble key={msg.id} message={msg} isOwn={msg.sender_id === userId} onDelete={deleteMessage} />
+          <MessageBubble key={msg.id} message={msg} isOwn={msg.sender_id === userId} onDelete={deleteMessage} onEdit={editMessage} />
         ))}
         <div ref={bottomRef} />
       </main>
